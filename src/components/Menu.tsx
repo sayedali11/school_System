@@ -1,3 +1,8 @@
+import { currentUser } from "@clerk/nextjs/server";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
+
 const menuItems = [
   {
     title: "MENU",
@@ -112,3 +117,35 @@ const menuItems = [
     ],
   },
 ];
+
+const Menu = async () => {
+  const user = await currentUser();
+  const role = user?.publicMetadata.role as string;
+  return (
+    <div className="mt-4 text-sm">
+      {menuItems.map((item) => (
+        <div key={item.title} className="flex flex-col gap-2">
+          <span className="hidden lg:block text-gray-400 font-light my-4">
+            {item.title}
+          </span>
+          {item.items.map((i) => {
+            if (i.visible.includes(role)) {
+              return (
+                <Link
+                  href={i.href}
+                  key={i.label}
+                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-schSkyLight"
+                >
+                  <Image src={i.icon} alt="" width={20} height={20} />
+                  <span className="hidden lg:block">{i.label}</span>
+                </Link>
+              );
+            }
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default Menu;
